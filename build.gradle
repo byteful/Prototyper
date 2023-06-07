@@ -1,9 +1,11 @@
 plugins {
     id 'java'
+    id 'idea'
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 group = 'me.byteful.plugin'
-version = '1.0-SNAPSHOT'
+version = '1.0.0'
 
 repositories {
     mavenCentral()
@@ -19,6 +21,7 @@ repositories {
 
 dependencies {
     compileOnly "org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT"
+    implementation 'org.graalvm.js:js:22.3.2'
 }
 
 def targetJavaVersion = 17
@@ -44,4 +47,11 @@ processResources {
     filesMatching('plugin.yml') {
         expand props
     }
+}
+
+shadowJar {
+    archiveBaseName.set("Prototyper")
+    archiveClassifier.set("")
+
+    mergeServiceFiles()
 }

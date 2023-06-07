@@ -1,4 +1,4 @@
 name: Prototyper
 version: '${version}'
-main: me.byteful.plugin.prototyper.Prototyper
+main: me.byteful.plugin.prototyper.PrototyperPlugin
 api-version: 1.19
