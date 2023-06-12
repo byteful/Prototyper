@@ -37,7 +37,7 @@ public class ScriptManager {
     }
   }
 
-  public void unload(Script script) {
+  void fail(Script script) {
     scripts.remove(script);
   }
 }

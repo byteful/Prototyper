@@ -1,0 +1,6 @@
+prototyper {
+  reload {
+    permission prototyper.reload
+    hook reload
+  }
+}

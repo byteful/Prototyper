@@ -17,11 +17,13 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven { url 'https://redempt.dev' }
 }
 
 dependencies {
     compileOnly "org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT"
     implementation 'org.graalvm.js:js:22.3.2'
+    implementation 'com.github.Redempt:RedCommands:1.5.7'
 }
 
 def targetJavaVersion = 17

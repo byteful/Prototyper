@@ -2,6 +2,7 @@ package me.byteful.plugin.prototyper;
 
 import me.byteful.plugin.prototyper.script.ScriptManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import redempt.redlib.commandmanager.CommandParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +22,8 @@ public final class PrototyperPlugin extends JavaPlugin {
 
     manager.reload(scriptsDir);
     getLogger().info("Reloaded scripts!");
+
+    new CommandParser(getResource("commands.rdcml")).parse().register(this, "prototyper", new Commands(this));
   }
 
   @Override
@@ -37,5 +40,13 @@ public final class PrototyperPlugin extends JavaPlugin {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public ScriptManager getManager() {
+    return manager;
+  }
+
+  public File getScriptsDir() {
+    return scriptsDir;
   }
 }
