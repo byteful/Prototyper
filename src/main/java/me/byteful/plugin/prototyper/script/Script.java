@@ -2,6 +2,7 @@ package me.byteful.plugin.prototyper.script;
 
 import me.byteful.plugin.prototyper.PrototyperPlugin;
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
 
@@ -11,7 +12,17 @@ public class Script {
   private final Context context;
 
   public Script(PrototyperPlugin plugin, ScriptManager manager, String name, String script) {
-    this.context = Context.newBuilder().allowExperimentalOptions(true).allowHostAccess(HostAccess.ALL).option("js.nashorn-compat", "true").build();
+    final Engine engine = Engine.newBuilder()
+          .option("engine.WarnInterpreterOnly", "false")
+          .build();
+    this.context = Context.newBuilder()
+            .allowExperimentalOptions(true)
+            .allowHostAccess(HostAccess.ALL)
+            .allowAllAccess(true)
+            .currentWorkingDirectory(plugin.getScriptsDir().toPath())
+            .option("js.nashorn-compat", "true")
+            .engine(engine)
+            .build();
 
     final Value binds = context.getBindings("js");
     init(plugin, name, binds);
