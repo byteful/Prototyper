@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'idea'
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = 'me.byteful.plugin'
@@ -21,12 +21,13 @@ repositories {
 }
 
 dependencies {
-    compileOnly "org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT"
-    implementation 'org.graalvm.js:js:22.3.2'
+    compileOnly "org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT"
+    implementation 'org.graalvm.js:js:24.1.0'
+    implementation 'org.graalvm.polyglot:polyglot:24.1.0'
     implementation 'com.github.Redempt:RedCommands:1.5.7'
 }
 
-def targetJavaVersion = 17
+def targetJavaVersion = 21
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion
