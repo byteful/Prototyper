@@ -4,11 +4,11 @@ import me.byteful.plugin.prototyper.PrototyperPlugin;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ScriptManager {
-    private final Set<Script> scripts = new HashSet<>();
+    private final Map<String, Script> scripts = new HashMap<>();
     private final PrototyperPlugin plugin;
 
     public ScriptManager(PrototyperPlugin plugin) {
@@ -16,8 +16,22 @@ public class ScriptManager {
     }
 
     public void unload() {
-        scripts.forEach(Script::unload);
+        scripts.values().forEach(Script::unload);
         scripts.clear();
+    }
+
+    public boolean unload(String scriptName) {
+        final Script script = scripts.remove(scriptName);
+        if (script != null) {
+            script.unload();
+            return true;
+        }
+
+        return false;
+    }
+
+    public Map<String, Script> getScripts() {
+        return scripts;
     }
 
     public void reload(File dir) {
@@ -29,7 +43,7 @@ public class ScriptManager {
             try {
                 final Script script = new Script(plugin, this, file.getName(), Files.readString(file.toPath()));
                 script.load();
-                scripts.add(script);
+                scripts.put(file.getName(), script);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -3,4 +3,12 @@ prototyper {
     permission prototyper.reload
     hook reload
   }
+  unload string:script {
+    permission prototyper.unload
+    hook unload
+  }
+  list {
+    permission prototyper.list
+    hook list
+  }
 }

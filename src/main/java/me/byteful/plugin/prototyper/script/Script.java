@@ -1,11 +1,10 @@
 package me.byteful.plugin.prototyper.script;
 
 import me.byteful.plugin.prototyper.PrototyperPlugin;
+import me.byteful.plugin.prototyper.util.WrappedCommand;
 import me.byteful.plugin.prototyper.util.WrappedEventListener;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
@@ -27,7 +26,7 @@ public class Script {
     private final Context context;
     private final PrototyperPlugin plugin;
     private final List<WrappedEventListener> eventListeners = new ArrayList<>();
-    private final Map<String, BukkitCommand> registeredCommands = new HashMap<>();
+    private final Map<String, WrappedCommand> registeredCommands = new HashMap<>();
 
     public Script(PrototyperPlugin plugin, ScriptManager manager, String name, String script) {
         this.plugin = plugin;
@@ -60,23 +59,18 @@ public class Script {
             Bukkit.getScheduler().runTask(plugin, () -> {
                 try {
                     final CommandMap commandMap = (CommandMap) Bukkit.getServer().getClass().getMethod("getCommandMap").invoke(Bukkit.getServer());
-                    final BukkitCommand bukkitCommand = new BukkitCommand(cmd) {
-                        @Override
-                        public boolean execute(CommandSender sender, String label, String[] args) {
-                            callback.apply(new Object[]{sender, args});
-                            return true;
-                        }
-                    };
+                    final WrappedCommand command = new WrappedCommand(plugin, cmd, callback);
 
-                    commandMap.register(plugin.getName(), bukkitCommand);
-                    registeredCommands.put(cmd, bukkitCommand); // Track registered commands
+                    commandMap.register(plugin.getName(), command);
+                    registeredCommands.put(cmd, command); // Track registered commands
+                    Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
                 } catch (Exception e) {
                     plugin.getLogger().severe("Failed to register command: " + cmd);
                     e.printStackTrace();
                 }
-
-                Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
             });
+
+            plugin.getLogger().info("Registered command: " + cmd);
         });
         // registerListener(Class<? extends Event>, Consumer<Event>)
         binds.putMember("registerListener", (BiConsumer<Class<? extends Event>, Function<Object[], Object>>) (s, e) -> {
@@ -98,6 +92,11 @@ public class Script {
     }
 
     void unload() {
+        final Value binds = context.getBindings("js");
+        binds.removeMember("registerCommand");
+        binds.removeMember("registerListener");
+        binds.removeMember("Plugin");
+        binds.removeMember("Bukkit");
         for (WrappedEventListener listener : eventListeners) {
             HandlerList.unregisterAll(listener);
         }
@@ -109,12 +108,13 @@ public class Script {
                 plugin.getLogger().info("Unregistered command: " + cmd);
             }
 
+            Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
             registeredCommands.clear();
         } catch (Exception e) {
             plugin.getLogger().severe("Failed to unregister commands.");
             e.printStackTrace();
         }
-        context.getBindings("js").getMember("unload").executeVoid();
+        binds.getMember("unload").executeVoid();
         context.close(true);
     }
 }
