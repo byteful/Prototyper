@@ -1,6 +1,8 @@
 package me.byteful.plugin.prototyper.script;
 
 import me.byteful.plugin.prototyper.PrototyperPlugin;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -15,15 +17,24 @@ public class ScriptManager {
         this.plugin = plugin;
     }
 
+    private void reloadPlayerCommands() {
+        Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
+    }
+
     public void unload() {
+        boolean alreadyEmpty = scripts.isEmpty();
         scripts.values().forEach(Script::unload);
         scripts.clear();
+        if (!alreadyEmpty) {
+            reloadPlayerCommands();
+        }
     }
 
     public boolean unload(String scriptName) {
         final Script script = scripts.remove(scriptName);
         if (script != null) {
             script.unload();
+            reloadPlayerCommands();
             return true;
         }
 
@@ -48,6 +59,9 @@ public class ScriptManager {
                 e.printStackTrace();
             }
         }
+
+        // Delay so scripts get some time to initialize and no commands are left out.
+        Bukkit.getScheduler().runTaskLater(plugin, this::reloadPlayerCommands, 20L);
     }
 
     void fail(Script script) {

@@ -1,37 +1,50 @@
 package me.byteful.plugin.prototyper;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import redempt.redlib.commandmanager.CommandHook;
+import revxrsal.commands.annotation.*;
+import revxrsal.commands.bukkit.actor.BukkitCommandActor;
+import revxrsal.commands.bukkit.annotation.CommandPermission;
+import revxrsal.commands.help.Help;
 
+import static org.bukkit.ChatColor.*;
+
+@Command("prototyper")
+@CommandPermission("prototyper.admin")
 public class Commands {
-    private final PrototyperPlugin plugin;
+    public static final String PREFIX = BLUE + "[PROTOTYPER] ";
+    @Dependency
+    private PrototyperPlugin plugin;
 
-    public Commands(PrototyperPlugin plugin) {
-        this.plugin = plugin;
+    @Subcommand("help")
+    public void onHelp(CommandSender sender, Help.SiblingCommands<BukkitCommandActor> commands) {
+        sender.sendMessage(PREFIX + GOLD + "List of commands:");
+        commands.all()
+                .stream()
+                .map(command -> "- " + command.usage())
+                .forEach(sender::sendMessage);
     }
 
-    @CommandHook("reload")
+    @Subcommand("reload")
     public void onReload(CommandSender sender) {
-        sender.sendMessage(ChatColor.BLUE + "[PROTOTYPER] " + ChatColor.YELLOW + "Reloading...");
+        sender.sendMessage(PREFIX + YELLOW + "Reloading...");
         plugin.getManager().reload(plugin.getScriptsDir());
-        sender.sendMessage(ChatColor.BLUE + "[PROTOTYPER] " + ChatColor.GREEN + "Successfully reloaded all scripts!");
+        sender.sendMessage(PREFIX + GREEN + "Successfully reloaded all scripts!");
     }
 
-    @CommandHook("unload")
+    @Subcommand("unload")
     public void onUnload(CommandSender sender, String script) {
         if (plugin.getManager().unload(script)) {
-            sender.sendMessage(ChatColor.BLUE + "[PROTOTYPER] " + "Done!");
+            sender.sendMessage(PREFIX + "Done!");
         } else {
-            sender.sendMessage(ChatColor.BLUE + "[PROTOTYPER] " + ChatColor.RED + "Script not found!");
+            sender.sendMessage(PREFIX + RED + "Script not found!");
         }
     }
 
-    @CommandHook("list")
+    @Subcommand("list")
     public void onList(CommandSender sender) {
-        sender.sendMessage(ChatColor.BLUE + "[PROTOTYPER] " + ChatColor.GOLD + "Scripts:");
+        sender.sendMessage(PREFIX + GOLD + "Scripts:");
         for (String name : plugin.getManager().getScripts().keySet()) {
-            sender.sendMessage(ChatColor.BLUE + "[PROTOTYPER] " + ChatColor.YELLOW + "- " + name);
+            sender.sendMessage(PREFIX + YELLOW + "- " + name);
         }
     }
 }

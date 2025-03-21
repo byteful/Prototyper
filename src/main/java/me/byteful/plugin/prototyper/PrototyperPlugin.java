@@ -2,7 +2,9 @@ package me.byteful.plugin.prototyper;
 
 import me.byteful.plugin.prototyper.script.ScriptManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import redempt.redlib.commandmanager.CommandParser;
+import revxrsal.commands.Lamp;
+import revxrsal.commands.bukkit.BukkitLamp;
+import revxrsal.commands.bukkit.actor.BukkitCommandActor;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +14,8 @@ import java.nio.file.Files;
 public final class PrototyperPlugin extends JavaPlugin {
     private final ScriptManager manager = new ScriptManager(this);
     private final File scriptsDir = new File(getDataFolder(), "scripts");
+
+    private Lamp<BukkitCommandActor> lamp;
 
     @Override
     public void onEnable() {
@@ -23,13 +27,19 @@ public final class PrototyperPlugin extends JavaPlugin {
         manager.reload(scriptsDir);
         getLogger().info("Reloaded scripts!");
 
-        new CommandParser(getResource("commands.rdcml")).parse().register(this, "prototyper", new Commands(this));
+        lamp = BukkitLamp.builder(this).build();
+        getLogger().info("Registered internal commands.");
+
+        getLogger().info("Prototyper has successfully started!");
     }
 
     @Override
     public void onDisable() {
         manager.unload();
         getLogger().info("Unloaded scripts!");
+
+        lamp.unregisterAllCommands();
+        getLogger().info("Unregistered all internal commands.");
     }
 
     private void saveTestScript() {

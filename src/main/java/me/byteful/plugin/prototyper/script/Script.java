@@ -5,7 +5,6 @@ import me.byteful.plugin.prototyper.util.WrappedCommand;
 import me.byteful.plugin.prototyper.util.WrappedEventListener;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -63,7 +62,6 @@ public class Script {
 
                     commandMap.register(plugin.getName(), command);
                     registeredCommands.put(cmd, command); // Track registered commands
-                    Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
                 } catch (Exception e) {
                     plugin.getLogger().severe("Failed to register command: " + cmd);
                     e.printStackTrace();
@@ -93,6 +91,7 @@ public class Script {
 
     void unload() {
         final Value binds = context.getBindings("js");
+        binds.getMember("unload").executeVoid();
         binds.removeMember("registerCommand");
         binds.removeMember("registerListener");
         binds.removeMember("Plugin");
@@ -108,13 +107,11 @@ public class Script {
                 plugin.getLogger().info("Unregistered command: " + cmd);
             }
 
-            Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
             registeredCommands.clear();
         } catch (Exception e) {
             plugin.getLogger().severe("Failed to unregister commands.");
             e.printStackTrace();
         }
-        binds.getMember("unload").executeVoid();
         context.close(true);
     }
 }

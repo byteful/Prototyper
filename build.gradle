@@ -1,7 +1,6 @@
 plugins {
     id 'java'
-    id 'idea'
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id 'com.gradleup.shadow' version '8.3.5'
 }
 
 group = 'me.byteful.plugin'
@@ -17,14 +16,23 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
-    maven { url 'https://redempt.dev' }
+    maven {
+        name = "papermc"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
 }
 
 dependencies {
-    compileOnly "org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT"
+    // PaperSpigot API
+    compileOnly "io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT"
+
+    // JavaScript engine
     implementation 'org.graalvm.js:js:24.1.0'
     implementation 'org.graalvm.polyglot:polyglot:24.1.0'
-    implementation 'com.github.Redempt:RedCommands:1.5.7'
+
+    // Command library
+    implementation 'io.github.revxrsal:lamp.common:4.0.0-beta.19'
+    implementation 'io.github.revxrsal:lamp.bukkit:4.0.0-beta.19'
 }
 
 def targetJavaVersion = 21
@@ -57,4 +65,6 @@ shadowJar {
     archiveClassifier.set("")
 
     mergeServiceFiles()
+
+    relocate 'revxrsal.commands', 'me.byteful.plugin.prototyper.libs.lamp'
 }
