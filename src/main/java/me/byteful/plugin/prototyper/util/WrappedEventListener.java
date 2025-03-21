@@ -1,7 +1,6 @@
 package me.byteful.plugin.prototyper.util;
 
 import org.bukkit.event.Event;
-import org.bukkit.event.EventException;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 
@@ -17,7 +16,7 @@ public class WrappedEventListener implements Listener, EventExecutor {
     }
 
     @Override
-    public void execute(Listener listener, Event event) throws EventException {
+    public void execute(Listener listener, Event event) {
         if (event.getClass().equals(type)) {
             callback.accept(event);
         }

@@ -28,6 +28,7 @@ public final class PrototyperPlugin extends JavaPlugin {
         getLogger().info("Reloaded scripts!");
 
         lamp = BukkitLamp.builder(this).build();
+        lamp.register(new Commands());
         getLogger().info("Registered internal commands.");
 
         getLogger().info("Prototyper has successfully started!");

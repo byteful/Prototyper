@@ -68,3 +68,5 @@ shadowJar {
 
     relocate 'revxrsal.commands', 'me.byteful.plugin.prototyper.libs.lamp'
 }
+
+build.dependsOn += shadowJar
